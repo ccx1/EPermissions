@@ -8,7 +8,7 @@
 
 #### 0. 集成
 
-    implementation 'com.ccx1:EPermissions:1.0.0'
+    implementation 'com.ccx1:EPermissions:1.0.1'
 
 如果报错,请在project中的build.gradle中加入
 
@@ -25,39 +25,28 @@
     implementation "io.reactivex.rxjava2:rxjava:lastVersion"
 
 
-#### 1. 初始化
+#### 1. 使用
 
-        mEPermissions = new EPermissions(this);
+    EPermissions.with(this)
+                .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Observer<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
 
-#### 2. 请求权限
+                    }
 
-        mEPermissions.request(Manifest.permission.CAMERA).subscribe(new Observer<Boolean>() {
-            @Override
-            public void onSubscribe(Disposable d) {
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        System.out.println(aBoolean);
+                    }
 
-            }
+                    @Override
+                    public void onError(Throwable e) {
 
-            @Override
-            public void onNext(Boolean aBoolean) {
-                System.out.println(aBoolean);
-            }
+                    }
 
-            @Override
-            public void onError(Throwable e) {
+                    @Override
+                    public void onComplete() {
 
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
-
-
-#### 3. 请求回调
-
-        @Override
-        public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-            mEPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
+                    }
+                });

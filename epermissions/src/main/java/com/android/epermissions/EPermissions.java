@@ -3,9 +3,11 @@ package com.android.epermissions;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 
 
 import java.util.ArrayList;
@@ -27,26 +29,57 @@ import io.reactivex.subjects.PublishSubject;
 public class EPermissions {
 
     private static       Object                                  TRIGGER                  = new Object();
+    private              EPermissionsFragment                    mPermissionFragment;
     private              FragmentActivity                        mActivity;
-    private final        Fragment                                mFragment;
     private              Map<String, PublishSubject<Permission>> mSubjectMap              = new HashMap<>();
     private static final int                                     PERMISSIONS_REQUEST_CODE = 1002;
+    private              FragmentManager                         mFragmentManager;
 
-    public EPermissions(FragmentActivity activity) {
+
+    private EPermissions() {
+    }
+
+
+    private EPermissions(FragmentActivity activity) {
         this(activity, null);
     }
 
-    public EPermissions(Fragment fragment) {
+    private EPermissions(Fragment fragment) {
         this(null, fragment);
     }
 
     private EPermissions(FragmentActivity activity, Fragment fragment) {
         this.mActivity = activity;
-        this.mFragment = fragment;
         if (activity == null && fragment != null) {
+            mFragmentManager = fragment.getChildFragmentManager();
             mActivity = fragment.getActivity();
+        } else {
+            mFragmentManager = mActivity.getSupportFragmentManager();
         }
+        mPermissionFragment = (EPermissionsFragment) getLazyFragment();
     }
+
+
+    public static EPermissions with(Fragment fragment) {
+        return new EPermissions(fragment);
+    }
+
+    public static EPermissions with(FragmentActivity activity) {
+        return new EPermissions(activity);
+    }
+
+    private Fragment getLazyFragment() {
+        Fragment fragment = mActivity.getSupportFragmentManager().findFragmentByTag(EPermissionsFragment.class.getName());
+        if (fragment == null) {
+            fragment = new EPermissionsFragment();
+            mFragmentManager
+                    .beginTransaction()
+                    .add(fragment, EPermissionsFragment.class.getName())
+                    .commitNow();
+        }
+        return fragment;
+    }
+
 
     public Observable<Boolean> request(String... permissions) {
         // 发送
@@ -101,7 +134,7 @@ public class EPermissions {
     }
 
     @SuppressLint("CheckResult")
-    @TargetApi(android.os.Build.VERSION_CODES.M)
+    @TargetApi(Build.VERSION_CODES.M)
     private Observable<Permission> requestImplementation(String... permissions) {
 
         List<Observable<Permission>> list = new ArrayList<>();
@@ -121,11 +154,13 @@ public class EPermissions {
             // 除去，已经同意和被版本原因解除的权限，剩下的则是需要请求的权限
             // 加入需要请求的权限
             // 创建一个Observable对象
-            PublishSubject<Permission> subject = mSubjectMap.get(permission);
+            PublishSubject<Permission> subject = mPermissionFragment.get(permission);
+//            PublishSubject<Permission> subject = mSubjectMap.get(permission);
             if (subject == null) {
                 unrequestedPermissions.add(permission);
                 subject = PublishSubject.create();
-                mSubjectMap.put(permission, subject);
+//                mSubjectMap.put(permission, subject);
+                mPermissionFragment.put(permission, subject);
             }
             list.add(subject);
 
@@ -133,11 +168,12 @@ public class EPermissions {
         // 如果权限池不为空，则需要请求权限
         if (!unrequestedPermissions.isEmpty()) {
             String[] unRequest = unrequestedPermissions.toArray(new String[unrequestedPermissions.size()]);
-            if (mFragment != null) {
-                mFragment.requestPermissions(unRequest, PERMISSIONS_REQUEST_CODE);
-            } else {
-                ActivityCompat.requestPermissions(mActivity, unRequest, PERMISSIONS_REQUEST_CODE);
-            }
+            mPermissionFragment.requestPermissions(unRequest);
+//            if (mFragment != null) {
+//                mFragment.requestPermissions(unRequest, PERMISSIONS_REQUEST_CODE);
+//            } else {
+//                ActivityCompat.requestPermissions(mActivity, unRequest, PERMISSIONS_REQUEST_CODE);
+//            }
 
         }
         // 1. 顺序发送

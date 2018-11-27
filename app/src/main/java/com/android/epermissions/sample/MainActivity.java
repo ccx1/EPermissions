@@ -16,39 +16,34 @@ import io.reactivex.disposables.Disposable;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private EPermissions mEPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mEPermissions = new EPermissions(this);
-        mEPermissions.request(Manifest.permission.CAMERA).subscribe(new Observer<Boolean>() {
-            @Override
-            public void onSubscribe(Disposable d) {
 
-            }
+        EPermissions.with(this)
+                .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Observer<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
 
-            @Override
-            public void onNext(Boolean aBoolean) {
-                System.out.println(aBoolean);
-            }
+                    }
 
-            @Override
-            public void onError(Throwable e) {
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        System.out.println(aBoolean);
+                    }
 
-            }
+                    @Override
+                    public void onError(Throwable e) {
 
-            @Override
-            public void onComplete() {
+                    }
 
-            }
-        });
-    }
+                    @Override
+                    public void onComplete() {
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        mEPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                    }
+                });
     }
 }
