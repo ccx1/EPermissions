@@ -6,6 +6,23 @@
 
 ### 如何使用
 
+#### 0. 集成
+
+    implementation 'com.ccx1:EPermissions:1.0.0'
+
+如果报错,请在project中的build.gradle中加入
+
+    allprojects {
+        repositories {
+            jcenter()
+            maven {url 'https://dl.bintray.com/ci250454344/EPermissions'}
+        }
+    }
+
+如果没有rxjava与rxandroid，则得先集成
+
+    implementation "io.reactivex.rxjava2:rxandroid:lastVersion"
+    implementation "io.reactivex.rxjava2:rxjava:lastVersion"
 
 
 #### 1. 初始化
