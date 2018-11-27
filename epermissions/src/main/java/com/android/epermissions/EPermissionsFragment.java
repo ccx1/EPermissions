@@ -12,7 +12,7 @@ import io.reactivex.subjects.PublishSubject;
 
 /**
  * @author ccx
- * @date 2018/11/27
+ * create time 2018/11/27
  */
 public class EPermissionsFragment extends Fragment {
 
