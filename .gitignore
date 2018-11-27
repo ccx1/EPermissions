@@ -6,5 +6,6 @@ androidTest
 test
 gradlew
 gradlew.bat
+build
 
 
