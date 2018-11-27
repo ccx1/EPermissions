@@ -22,7 +22,7 @@ import io.reactivex.subjects.PublishSubject;
 
 /**
  * @author ccx
- * @date 2018/11/16
+ * create time 2018/11/16
  */
 public class EPermissions {
 
