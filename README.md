@@ -49,4 +49,11 @@
                     public void onComplete() {
 
                     }
-                });
+                });'
+
+
+### 注意点：
+
+request方法传入的是一个可变参数
+
+    request(String... permissions)
