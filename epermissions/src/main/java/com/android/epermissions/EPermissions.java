@@ -188,6 +188,7 @@ public class EPermissions {
 
     private Observable<?> oneOf(Observable<?> trigger, Observable<?> pending) {
         if (trigger == null) {
+            // 如果trigger为空，实际上对后续数据返回会产生影响，rxjava中会直接报错，所以我们产生了一个新的数据进去
             return Observable.just(TRIGGER);
         }
         return Observable.merge(trigger, pending);
